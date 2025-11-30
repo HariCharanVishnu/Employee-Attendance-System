@@ -29,6 +29,12 @@ const checkIn = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Check if today is Sunday (0 = Sunday, 6 = Saturday)
+    const dayOfWeek = today.getDay();
+    if (dayOfWeek === 0) {
+      return res.status(400).json({ message: 'Check-in is not allowed on Sundays' });
+    }
+
     // Check if already checked in today
     let attendance = await Attendance.findOne({
       userId: req.user._id,

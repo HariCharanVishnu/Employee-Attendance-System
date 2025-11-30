@@ -14,6 +14,30 @@ const MarkAttendance = () => {
   }, [dispatch]);
 
   const handleCheckIn = async () => {
+    // Get current time for confirmation
+    const currentTime = new Date();
+    const timeString = currentTime.toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+
+    // Show confirmation alert with time
+    const confirmed = window.confirm(
+      `Confirm Check-In\n\n` +
+      `Time: ${timeString}\n\n` +
+      `Do you want to check in now?`
+    );
+
+    if (!confirmed) {
+      return; // User cancelled
+    }
+
     setLoading(true);
     setMessage('');
     try {
@@ -44,11 +68,21 @@ const MarkAttendance = () => {
   const isCheckedIn = todayStatus?.checkInTime;
   const isCheckedOut = todayStatus?.checkOutTime;
 
+  // Check if today is Sunday (0 = Sunday)
+  const today = new Date();
+  const isSunday = today.getDay() === 0;
+
   return (
     <div className="mark-attendance">
       <h1>Mark Attendance</h1>
 
       <div className="attendance-card">
+        {isSunday && !isCheckedIn && (
+          <div className="message error" style={{ marginBottom: '20px' }}>
+            ⚠️ Check-in is not allowed on Sundays
+          </div>
+        )}
+        
         <div className="current-status">
           <h2>Today's Status</h2>
           <div className={`status-indicator ${todayStatus?.status || 'absent'}`}>
@@ -92,7 +126,8 @@ const MarkAttendance = () => {
             <button
               onClick={handleCheckIn}
               className="btn-checkin"
-              disabled={loading}
+              disabled={loading || isSunday}
+              title={isSunday ? 'Check-in is not allowed on Sundays' : ''}
             >
               {loading ? 'Processing...' : 'Check In'}
             </button>
@@ -121,6 +156,7 @@ const MarkAttendance = () => {
         <ul>
           <li>Check in before 9:00 AM to be marked as present</li>
           <li>Check in after 9:00 AM will be marked as late</li>
+          <li>Check-in is not allowed on Sundays</li>
           <li>Make sure to check out at the end of your work day</li>
           <li>Working less than 4 hours will be marked as half-day</li>
         </ul>
