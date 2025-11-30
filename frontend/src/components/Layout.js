@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
+import { useDarkMode } from '../hooks/useDarkMode';
 import './Layout.css';
 
 const Layout = ({ children }) => {
@@ -9,6 +10,7 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
+  const [darkMode, toggleDarkMode] = useDarkMode();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -83,6 +85,13 @@ const Layout = ({ children }) => {
               </>
             )}
             <div className="user-info">
+              <button
+                onClick={toggleDarkMode}
+                className="dark-mode-toggle"
+                title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              >
+                {darkMode ? '☀️' : '🌙'}
+              </button>
               <span>{user?.name}</span>
               <button onClick={handleLogout} className="logout-btn">
                 Logout

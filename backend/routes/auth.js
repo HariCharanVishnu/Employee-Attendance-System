@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const auth = require('../middleware/auth');
-const { register, login, getCurrentUser } = require('../controllers/userController');
+const { register, login, getCurrentUser, changePassword } = require('../controllers/userController');
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
@@ -39,6 +39,21 @@ router.post('/login', [
 // @desc    Get current user
 // @access  Private
 router.get('/me', auth, getCurrentUser);
+
+// @route   PUT /api/auth/change-password
+// @desc    Change password
+// @access  Private
+router.put('/change-password', [
+  auth,
+  body('currentPassword').notEmpty().withMessage('Current password is required'),
+  body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
+], (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+}, changePassword);
 
 module.exports = router;
 

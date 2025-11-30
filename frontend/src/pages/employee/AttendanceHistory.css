@@ -120,11 +120,89 @@
   justify-content: center;
   border-radius: 5px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-day::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.calendar-day:hover::before {
+  left: 100%;
 }
 
 .calendar-day:hover {
-  transform: scale(1.05);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.calendar-day.today {
+  border: 3px solid #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.5);
+  }
+}
+
+.calendar-day[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  padding-bottom: calc(0.5rem + 5px);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  border-radius: 5px;
+  white-space: pre-line;
+  font-size: 0.85rem;
+  z-index: 1000;
+  min-width: 150px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: tooltipFadeIn 0.3s ease;
+  clip-path: polygon(50% 100%, 0% calc(100% - 5px), 0% 0%, 100% 0%, 100% calc(100% - 5px));
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.today-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.6rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
 }
 
 .day-number {
@@ -213,6 +291,120 @@ th {
   color: #6c5ce7;
 }
 
+/* Table Controls */
+.table-controls {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.search-filter-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.export-btn {
+  padding: 0.75rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.export-btn:hover {
+  background: #5568d3;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+/* Sortable Headers */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.page-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 500;
+  color: #666;
+}
+
 @media (max-width: 768px) {
   .history-header {
     flex-direction: column;
@@ -222,6 +414,19 @@ th {
 
   .calendar-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .table-controls {
+    flex-direction: column;
+  }
+
+  .search-filter-group {
+    width: 100%;
+  }
+
+  .search-input,
+  .filter-select {
+    width: 100%;
   }
 }
 

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { checkIn, checkOut, getTodayStatus } from '../../store/slices/attendanceSlice';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './MarkAttendance.css';
 
 const MarkAttendance = () => {
@@ -42,10 +44,19 @@ const MarkAttendance = () => {
     setMessage('');
     try {
       await dispatch(checkIn()).unwrap();
+      toast.success('✅ Checked in successfully!', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
       setMessage('Checked in successfully!');
       dispatch(getTodayStatus());
     } catch (error) {
-      setMessage(error || 'Failed to check in');
+      const errorMsg = error || 'Failed to check in';
+      toast.error(`❌ ${errorMsg}`, {
+        position: 'top-right',
+        autoClose: 4000,
+      });
+      setMessage(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -56,10 +67,19 @@ const MarkAttendance = () => {
     setMessage('');
     try {
       await dispatch(checkOut()).unwrap();
+      toast.success('✅ Checked out successfully!', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
       setMessage('Checked out successfully!');
       dispatch(getTodayStatus());
     } catch (error) {
-      setMessage(error || 'Failed to check out');
+      const errorMsg = error || 'Failed to check out';
+      toast.error(`❌ ${errorMsg}`, {
+        position: 'top-right',
+        autoClose: 4000,
+      });
+      setMessage(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -122,6 +142,7 @@ const MarkAttendance = () => {
         )}
 
         <div className="action-buttons">
+          {loading && <LoadingSpinner size="small" />}
           {!isCheckedIn && (
             <button
               onClick={handleCheckIn}

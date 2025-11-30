@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
 import { checkAuth } from './store/slices/authSlice';
 
 // Employee Pages
@@ -40,51 +41,65 @@ function App() {
   };
 
   return (
-    <Routes>
-      {/* Employee Routes */}
-      <Route path="/employee/login" element={<EmployeeLogin />} />
-      <Route path="/employee/register" element={<EmployeeRegister />} />
-      
-      <Route
-        path="/employee/*"
-        element={
-          <PrivateRoute allowedRoles={['employee']}>
-            <Layout>
-              <Routes>
-                <Route path="dashboard" element={<EmployeeDashboard />} />
-                <Route path="mark-attendance" element={<MarkAttendance />} />
-                <Route path="history" element={<AttendanceHistory />} />
-                <Route path="profile" element={<EmployeeProfile />} />
-                <Route path="*" element={<Navigate to="/employee/dashboard" />} />
-              </Routes>
-            </Layout>
-          </PrivateRoute>
-        }
-      />
+    <>
+      <Routes>
+        {/* Employee Routes */}
+        <Route path="/employee/login" element={<EmployeeLogin />} />
+        <Route path="/employee/register" element={<EmployeeRegister />} />
+        
+        <Route
+          path="/employee/*"
+          element={
+            <PrivateRoute allowedRoles={['employee']}>
+              <Layout>
+                <Routes>
+                  <Route path="dashboard" element={<EmployeeDashboard />} />
+                  <Route path="mark-attendance" element={<MarkAttendance />} />
+                  <Route path="history" element={<AttendanceHistory />} />
+                  <Route path="profile" element={<EmployeeProfile />} />
+                  <Route path="*" element={<Navigate to="/employee/dashboard" />} />
+                </Routes>
+              </Layout>
+            </PrivateRoute>
+          }
+        />
 
-      {/* Manager Routes */}
-      <Route path="/manager/login" element={<ManagerLogin />} />
-      
-      <Route
-        path="/manager/*"
-        element={
-          <PrivateRoute allowedRoles={['manager']}>
-            <Layout>
-              <Routes>
-                <Route path="dashboard" element={<ManagerDashboard />} />
-                <Route path="attendance" element={<AllAttendance />} />
-                <Route path="calendar" element={<TeamCalendar />} />
-                <Route path="reports" element={<Reports />} />
-                <Route path="*" element={<Navigate to="/manager/dashboard" />} />
-              </Routes>
-            </Layout>
-          </PrivateRoute>
-        }
-      />
+        {/* Manager Routes */}
+        <Route path="/manager/login" element={<ManagerLogin />} />
+        
+        <Route
+          path="/manager/*"
+          element={
+            <PrivateRoute allowedRoles={['manager']}>
+              <Layout>
+                <Routes>
+                  <Route path="dashboard" element={<ManagerDashboard />} />
+                  <Route path="attendance" element={<AllAttendance />} />
+                  <Route path="calendar" element={<TeamCalendar />} />
+                  <Route path="reports" element={<Reports />} />
+                  <Route path="*" element={<Navigate to="/manager/dashboard" />} />
+                </Routes>
+              </Layout>
+            </PrivateRoute>
+          }
+        />
 
-      {/* Default Route */}
-      <Route path="/" element={<Navigate to={isAuthenticated ? (user?.role === 'manager' ? '/manager/dashboard' : '/employee/dashboard') : '/employee/login'} />} />
-    </Routes>
+        {/* Default Route */}
+        <Route path="/" element={<Navigate to={isAuthenticated ? (user?.role === 'manager' ? '/manager/dashboard' : '/employee/dashboard') : '/employee/login'} />} />
+      </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </>
   );
 }
 

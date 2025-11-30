@@ -144,29 +144,121 @@ const attendanceSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Check In
+      .addCase(checkIn.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(checkIn.fulfilled, (state, action) => {
+        state.loading = false;
         state.todayStatus = action.payload.attendance;
+      })
+      .addCase(checkIn.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Check Out
+      .addCase(checkOut.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(checkOut.fulfilled, (state, action) => {
+        state.loading = false;
         state.todayStatus = action.payload.attendance;
+      })
+      .addCase(checkOut.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get Today Status
+      .addCase(getTodayStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(getTodayStatus.fulfilled, (state, action) => {
+        state.loading = false;
         state.todayStatus = action.payload.attendance;
       })
+      .addCase(getTodayStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get My History
+      .addCase(getMyHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getMyHistory.fulfilled, (state, action) => {
+        state.loading = false;
         state.myHistory = action.payload.attendance;
       })
+      .addCase(getMyHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get My Summary
+      .addCase(getMySummary.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getMySummary.fulfilled, (state, action) => {
+        state.loading = false;
         state.mySummary = action.payload;
       })
+      .addCase(getMySummary.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get All Attendance
+      .addCase(getAllAttendance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getAllAttendance.fulfilled, (state, action) => {
+        state.loading = false;
         state.allAttendance = action.payload.attendance;
       })
+      .addCase(getAllAttendance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get Team Summary
+      .addCase(getTeamSummary.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getTeamSummary.fulfilled, (state, action) => {
+        state.loading = false;
         state.teamSummary = action.payload.summary;
       })
+      .addCase(getTeamSummary.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get Today Status All
+      .addCase(getTodayStatusAll.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getTodayStatusAll.fulfilled, (state, action) => {
+        state.loading = false;
         state.todayStatusAll = action.payload;
+      })
+      .addCase(getTodayStatusAll.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Export Attendance
+      .addCase(exportAttendance.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(exportAttendance.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(exportAttendance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

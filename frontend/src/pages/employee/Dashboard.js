@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { getTodayStatus } from '../../store/slices/attendanceSlice';
 import api from '../../utils/api';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './Dashboard.css';
 
 const EmployeeDashboard = () => {
@@ -28,8 +30,25 @@ const EmployeeDashboard = () => {
     }
   };
 
+  // Prepare chart data
+  const pieData = dashboardData?.monthStats ? [
+    { name: 'Present', value: dashboardData.monthStats.present, color: '#28a745' },
+    { name: 'Absent', value: dashboardData.monthStats.absent, color: '#dc3545' },
+    { name: 'Late', value: dashboardData.monthStats.late, color: '#ffc107' },
+  ].filter(item => item.value > 0) : [];
+
+  const weeklyData = dashboardData?.recentAttendance?.slice(0, 7).map(record => ({
+    date: new Date(record.date).toLocaleDateString('en-US', { weekday: 'short' }),
+    hours: parseFloat(record.totalHours || 0),
+    status: record.status
+  })).reverse() || [];
+
   if (loading) {
-    return <div className="dashboard-loading">Loading...</div>;
+    return (
+      <div className="dashboard-loading">
+        <LoadingSpinner size="large" />
+      </div>
+    );
   }
 
   return (
@@ -79,6 +98,51 @@ const EmployeeDashboard = () => {
           <h3>Total Hours</h3>
           <p className="stat-number">{dashboardData?.monthStats?.totalHours || 0}</p>
         </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-grid">
+        {pieData.length > 0 && (
+          <div className="dashboard-card chart-card">
+            <h2>Monthly Attendance Distribution</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {weeklyData.length > 0 && (
+          <div className="dashboard-card chart-card">
+            <h2>Weekly Hours Trend</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={weeklyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="hours" fill="#667eea" name="Hours Worked" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/* Recent Attendance */}
