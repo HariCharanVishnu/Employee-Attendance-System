@@ -171,3 +171,8 @@ The frontend will run on `http://localhost:3000`
 - All passwords are hashed using bcrypt
 - JWT tokens are used for authentication
 
+## My Details
+
+Name - Kota Hari Charan Vishnu
+College Name - Mohan Babu University
+Contact No - 8074027101
