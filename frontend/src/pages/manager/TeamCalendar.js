@@ -7,7 +7,17 @@ import './TeamCalendar.css';
 const TeamCalendar = () => {
   const dispatch = useDispatch();
   const { allAttendance } = useSelector((state) => state.attendance);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  
+  // Ensure initial date is valid
+  const getInitialDate = () => {
+    const today = new Date();
+    if (isNaN(today.getTime())) {
+      return new Date(2024, 0, 1); // Fallback date
+    }
+    return today;
+  };
+  
+  const [selectedDate, setSelectedDate] = useState(getInitialDate());
   const [selectedDayAttendance, setSelectedDayAttendance] = useState([]);
 
   useEffect(() => {
@@ -15,12 +25,23 @@ const TeamCalendar = () => {
   }, [selectedDate]);
 
   const loadAttendance = async () => {
-    const month = selectedDate.getMonth() + 1;
-    const year = selectedDate.getFullYear();
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0, 23, 59, 59);
-
     try {
+      // Use a valid date - either selectedDate or current date
+      const dateToUse = (selectedDate && !isNaN(selectedDate.getTime())) 
+        ? selectedDate 
+        : new Date();
+
+      const month = dateToUse.getMonth() + 1;
+      const year = dateToUse.getFullYear();
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0, 23, 59, 59);
+
+      // Validate the calculated dates
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        console.error('Invalid date range calculated');
+        return;
+      }
+
       await dispatch(
         getAllAttendance({
           startDate: startDate.toISOString(),
@@ -33,8 +54,22 @@ const TeamCalendar = () => {
   };
 
   const handleMonthChange = (e) => {
-    const [year, month] = e.target.value.split('-');
-    setSelectedDate(new Date(year, month - 1, 1));
+    try {
+      const [year, month] = e.target.value.split('-');
+      const newDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+      
+      // Validate the date
+      if (isNaN(newDate.getTime())) {
+        console.error('Invalid date created, using current date');
+        setSelectedDate(new Date());
+        return;
+      }
+      
+      setSelectedDate(newDate);
+    } catch (error) {
+      console.error('Error changing month:', error);
+      setSelectedDate(new Date());
+    }
   };
 
   const handleDayClick = (day) => {
@@ -53,9 +88,48 @@ const TeamCalendar = () => {
     return { present, absent, total: dayRecords.length };
   };
 
-  const monthStart = startOfMonth(selectedDate);
-  const monthEnd = endOfMonth(selectedDate);
-  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  // Safely get month start and end dates
+  const getMonthDays = () => {
+    try {
+      // Ensure selectedDate is valid
+      if (!selectedDate || isNaN(selectedDate.getTime())) {
+        const today = new Date();
+        const monthStart = startOfMonth(today);
+        const monthEnd = endOfMonth(today);
+        return eachDayOfInterval({ start: monthStart, end: monthEnd });
+      }
+
+      const monthStart = startOfMonth(selectedDate);
+      const monthEnd = endOfMonth(selectedDate);
+
+      // Validate dates before using eachDayOfInterval
+      if (!monthStart || !monthEnd || isNaN(monthStart.getTime()) || isNaN(monthEnd.getTime())) {
+        const today = new Date();
+        const fallbackStart = startOfMonth(today);
+        const fallbackEnd = endOfMonth(today);
+        return eachDayOfInterval({ start: fallbackStart, end: fallbackEnd });
+      }
+
+      // Ensure start is before or equal to end
+      if (monthStart > monthEnd) {
+        const today = new Date();
+        const fallbackStart = startOfMonth(today);
+        const fallbackEnd = endOfMonth(today);
+        return eachDayOfInterval({ start: fallbackStart, end: fallbackEnd });
+      }
+
+      return eachDayOfInterval({ start: monthStart, end: monthEnd });
+    } catch (error) {
+      console.error('Error generating month days:', error);
+      // Fallback to current month
+      const today = new Date();
+      const fallbackStart = startOfMonth(today);
+      const fallbackEnd = endOfMonth(today);
+      return eachDayOfInterval({ start: fallbackStart, end: fallbackEnd });
+    }
+  };
+
+  const daysInMonth = getMonthDays();
 
   return (
     <div className="team-calendar">
@@ -65,7 +139,7 @@ const TeamCalendar = () => {
         <label>Select Month:</label>
         <input
           type="month"
-          value={format(selectedDate, 'yyyy-MM')}
+          value={selectedDate && !isNaN(selectedDate.getTime()) ? format(selectedDate, 'yyyy-MM') : format(new Date(), 'yyyy-MM')}
           onChange={handleMonthChange}
         />
       </div>
@@ -73,7 +147,8 @@ const TeamCalendar = () => {
       <div className="calendar-container">
         <div className="calendar-view">
           <div className="calendar-grid">
-            {daysInMonth.map((day) => {
+            {daysInMonth && daysInMonth.length > 0 ? daysInMonth.map((day) => {
+              if (!day || isNaN(day.getTime())) return null;
               const stats = getDayStats(day);
               return (
                 <div
@@ -88,7 +163,9 @@ const TeamCalendar = () => {
                   </div>
                 </div>
               );
-            })}
+            }) : (
+              <div className="calendar-error">Unable to load calendar. Please try again.</div>
+            )}
           </div>
         </div>
 
