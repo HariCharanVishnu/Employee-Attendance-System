@@ -30,12 +30,12 @@ async function seedDatabase() {
     // Create Manager
     console.log('👔 Creating manager...');
     const manager = new User({
-      name: 'John Manager',
-      email: 'manager@company.com',
-      password: 'manager123',
+      name: 'Sarah Thompson',
+      email: 'sarah.thompson@techcorp.com',
+      password: 'admin2024',
       role: 'manager',
       employeeId: 'MGR001',
-      department: 'Management'
+      department: 'Operations'
     });
     await manager.save();
     console.log('✅ Manager created:', manager.email, `(${manager.employeeId})\n`);
@@ -44,39 +44,60 @@ async function seedDatabase() {
     console.log('👥 Creating employees...');
     const employees = [
       {
-        name: 'Alice Johnson',
-        email: 'alice@company.com',
-        password: 'employee123',
+        name: 'Michael Chen',
+        email: 'michael.chen@techcorp.com',
+        password: 'password123',
         role: 'employee',
-        department: 'Engineering'
+        department: 'Software Development'
       },
       {
-        name: 'Bob Smith',
-        email: 'bob@company.com',
-        password: 'employee123',
+        name: 'Priya Patel',
+        email: 'priya.patel@techcorp.com',
+        password: 'password123',
         role: 'employee',
-        department: 'Engineering'
+        department: 'Software Development'
       },
       {
-        name: 'Carol Williams',
-        email: 'carol@company.com',
-        password: 'employee123',
+        name: 'James Wilson',
+        email: 'james.wilson@techcorp.com',
+        password: 'password123',
+        role: 'employee',
+        department: 'Quality Assurance'
+      },
+      {
+        name: 'Sophia Martinez',
+        email: 'sophia.martinez@techcorp.com',
+        password: 'password123',
+        role: 'employee',
+        department: 'Product Design'
+      },
+      {
+        name: 'Ryan O\'Connor',
+        email: 'ryan.oconnor@techcorp.com',
+        password: 'password123',
         role: 'employee',
         department: 'Marketing'
       },
       {
-        name: 'David Brown',
-        email: 'david@company.com',
-        password: 'employee123',
+        name: 'Lisa Anderson',
+        email: 'lisa.anderson@techcorp.com',
+        password: 'password123',
         role: 'employee',
         department: 'Sales'
       },
       {
-        name: 'Emma Davis',
-        email: 'emma@company.com',
-        password: 'employee123',
+        name: 'Kevin Kim',
+        email: 'kevin.kim@techcorp.com',
+        password: 'password123',
         role: 'employee',
-        department: 'HR'
+        department: 'Customer Support'
+      },
+      {
+        name: 'Amanda Taylor',
+        email: 'amanda.taylor@techcorp.com',
+        password: 'password123',
+        role: 'employee',
+        department: 'Human Resources'
       }
     ];
 
@@ -101,8 +122,8 @@ async function seedDatabase() {
     const today = new Date();
     const attendanceRecords = [];
 
-    // Create attendance for the last 30 days for each employee
-    for (let day = 0; day < 30; day++) {
+    // Create attendance for the last 45 days for each employee
+    for (let day = 0; day < 45; day++) {
       const date = new Date(today);
       date.setDate(date.getDate() - day);
       date.setHours(0, 0, 0, 0);
@@ -112,25 +133,25 @@ async function seedDatabase() {
       if (dayOfWeek === 0 || dayOfWeek === 6) continue;
 
       for (const employee of createdEmployees) {
-        // Randomly decide if employee was present (80% chance)
-        const isPresent = Math.random() > 0.2;
+        // Randomly decide if employee was present (85% chance)
+        const isPresent = Math.random() > 0.15;
         
         if (isPresent) {
-          // Random check-in time between 8:00 AM and 10:00 AM
-          const checkInHour = 8 + Math.floor(Math.random() * 2);
-          const checkInMinute = Math.floor(Math.random() * 60);
+          // Random check-in time between 7:30 AM and 9:30 AM
+          const checkInHour = 7 + Math.floor(Math.random() * 2);
+          const checkInMinute = Math.random() > 0.5 ? 30 : Math.floor(Math.random() * 30);
           const checkInTime = new Date(date);
           checkInTime.setHours(checkInHour, checkInMinute, 0, 0);
 
           // Determine status based on check-in time
           let status = 'present';
-          if (checkInHour >= 9) {
+          if (checkInHour >= 9 || (checkInHour === 8 && checkInMinute > 30)) {
             status = 'late';
           }
 
-          // Random check-out time between 5:00 PM and 7:00 PM
+          // Random check-out time between 5:00 PM and 6:30 PM
           const checkOutHour = 17 + Math.floor(Math.random() * 2);
-          const checkOutMinute = Math.floor(Math.random() * 60);
+          const checkOutMinute = checkOutHour === 17 ? Math.floor(Math.random() * 60) : Math.floor(Math.random() * 30);
           const checkOutTime = new Date(date);
           checkOutTime.setHours(checkOutHour, checkOutMinute, 0, 0);
 
@@ -172,44 +193,54 @@ async function seedDatabase() {
     console.log('📅 Creating today\'s attendance...');
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
+    const todayDayOfWeek = todayDate.getDay();
 
-    for (let i = 0; i < 3; i++) {
-      const employee = createdEmployees[i];
-      const checkInHour = 8 + Math.floor(Math.random() * 2);
-      const checkInMinute = Math.floor(Math.random() * 60);
-      const checkInTime = new Date();
-      checkInTime.setHours(checkInHour, checkInMinute, 0, 0);
+    // Only create today's attendance if it's a weekday
+    if (todayDayOfWeek !== 0 && todayDayOfWeek !== 6) {
+      // Create attendance for 5 employees today
+      for (let i = 0; i < Math.min(5, createdEmployees.length); i++) {
+        const employee = createdEmployees[i];
+        const checkInHour = 7 + Math.floor(Math.random() * 2);
+        const checkInMinute = Math.random() > 0.5 ? 30 : Math.floor(Math.random() * 30);
+        const checkInTime = new Date();
+        checkInTime.setHours(checkInHour, checkInMinute, 0, 0);
 
-      let status = 'present';
-      if (checkInHour >= 9) {
-        status = 'late';
+        let status = 'present';
+        if (checkInHour >= 9 || (checkInHour === 8 && checkInMinute > 30)) {
+          status = 'late';
+        }
+
+        const attendance = new Attendance({
+          userId: employee._id,
+          date: todayDate,
+          checkInTime: checkInTime,
+          status: status
+        });
+
+        await attendance.save();
+        console.log(`✅ Today's attendance: ${employee.name} - Checked in at ${checkInTime.toLocaleTimeString()}`);
       }
-
-      const attendance = new Attendance({
-        userId: employee._id,
-        date: todayDate,
-        checkInTime: checkInTime,
-        status: status
-      });
-
-      await attendance.save();
-      console.log(`✅ Today's attendance: ${employee.name} - Checked in at ${checkInTime.toLocaleTimeString()}`);
+    } else {
+      console.log('ℹ️  Today is a weekend, skipping today\'s attendance creation');
     }
 
+    const todayAttendanceCount = (todayDayOfWeek !== 0 && todayDayOfWeek !== 6) ? Math.min(5, createdEmployees.length) : 0;
+    
     console.log('\n📊 Summary:');
     console.log(`   👔 Managers: 1`);
     console.log(`   👥 Employees: ${createdEmployees.length}`);
-    console.log(`   📅 Attendance Records: ${attendanceRecords.length + 3}`);
-    console.log('\n✅ Sample data seeded successfully!\n');
+    console.log(`   📅 Historical Attendance Records: ${attendanceRecords.length}`);
+    console.log(`   📅 Today's Attendance Records: ${todayAttendanceCount}`);
+    console.log(`   📅 Total Attendance Records: ${attendanceRecords.length + todayAttendanceCount}`);
+    console.log('\n✅ New sample data seeded successfully!\n');
 
     console.log('🔑 Login Credentials:');
     console.log('\n   Manager:');
-    console.log('   Email: manager@company.com');
-    console.log('   Password: manager123\n');
-    console.log('   Employees:');
+    console.log('   Email: sarah.thompson@techcorp.com');
+    console.log('   Password: admin2024\n');
+    console.log('   Employees (all use password: password123):');
     employees.forEach(emp => {
-      console.log(`   Email: ${emp.email}`);
-      console.log(`   Password: employee123`);
+      console.log(`   - ${emp.name}: ${emp.email}`);
     });
     console.log('\n');
 
