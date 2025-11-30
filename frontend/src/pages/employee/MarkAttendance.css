@@ -11,10 +11,45 @@
 .attendance-card {
   background: white;
   padding: 3rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   text-align: center;
   margin-bottom: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInScale 0.6s ease-out;
+}
+
+.attendance-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .current-status h2 {
@@ -24,11 +59,24 @@
 
 .status-indicator {
   display: inline-block;
-  padding: 1rem 3rem;
-  border-radius: 30px;
+  padding: 1.25rem 3.5rem;
+  border-radius: 50px;
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 .status-indicator.present {
@@ -48,15 +96,68 @@
 
 .time-info {
   margin: 1.5rem 0;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 5px;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.time-info p {
-  margin: 0.5rem 0;
+.time-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.time-info-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.time-info-item.highlight {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.time-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.time-info-item.highlight .time-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.time-value {
+  font-weight: 600;
   color: #333;
   font-size: 1.1rem;
+}
+
+.time-info-item.highlight .time-value {
+  color: white;
+}
+
+.time-value.hours {
+  font-size: 1.3rem;
+}
+
+.time-value.status-present {
+  color: var(--success);
+}
+
+.time-value.status-late {
+  color: var(--warning);
+}
+
+.time-value.status-half-day {
+  color: var(--half-day);
 }
 
 .message {
@@ -82,13 +183,58 @@
 
 .btn-checkin,
 .btn-checkout {
-  padding: 1rem 3rem;
+  padding: 1.5rem 3.5rem;
   font-size: 1.2rem;
   font-weight: 600;
   border: none;
-  border-radius: 5px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+.btn-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.btn-text {
+  font-size: 1.1rem;
+}
+
+.btn-time {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.btn-checkin::before,
+.btn-checkout::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  z-index: -1;
+}
+
+.btn-checkin:hover::before,
+.btn-checkout:hover::before {
+  width: 400px;
+  height: 400px;
 }
 
 .btn-checkin {
@@ -103,7 +249,13 @@
 
 .btn-checkin:hover:not(:disabled),
 .btn-checkout:hover:not(:disabled) {
-  opacity: 0.9;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.btn-checkin:active:not(:disabled),
+.btn-checkout:active:not(:disabled) {
+  transform: translateY(-1px) scale(1);
 }
 
 .btn-checkin:disabled,
@@ -116,16 +268,48 @@
   color: #28a745;
   font-size: 1.1rem;
   font-weight: 500;
-  padding: 1rem;
-  background-color: #d4edda;
-  border-radius: 5px;
+  padding: 2rem;
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid #28a745;
+}
+
+.completed-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: checkmark 0.6s ease-out;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.completed-message p {
+  margin: 0.5rem 0;
+}
+
+.completed-time {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
 }
 
 .info-card {
   background: white;
   padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
 .info-card h3 {
@@ -141,5 +325,308 @@
 
 .info-card li {
   margin-bottom: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.info-card li:hover {
+  transform: translateX(5px);
+  color: var(--primary);
+}
+
+/* Live Clock */
+.live-clock {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.clock-time {
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.clock-date {
+  font-size: 1rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Status Preview */
+.status-preview {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  border: 2px solid;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  animation: slideIn 0.5s ease-out;
+}
+
+.status-preview-icon {
+  font-size: 2.5rem;
+}
+
+.status-preview-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.status-preview-text strong {
+  font-size: 1.1rem;
+}
+
+.status-preview-text span {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #666;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+  background: #f8f9fa;
+  color: #333;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-time-display {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+}
+
+.modal-time {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.modal-date {
+  font-size: 1rem;
+  color: #666;
+}
+
+.modal-status-preview {
+  padding: 1.5rem;
+  border: 2px solid;
+  border-radius: 12px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.modal-checkin-info {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-checkin-info p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.btn-cancel,
+.btn-confirm {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background: #f8f9fa;
+  color: #666;
+}
+
+.btn-cancel:hover {
+  background: #e9ecef;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border-radius: 16px;
+  z-index: 10;
+}
+
+.loading-overlay p {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .mark-attendance h1 {
+    font-size: 1.5rem;
+  }
+
+  .live-clock {
+    padding: 1rem;
+  }
+
+  .clock-time {
+    font-size: 2rem;
+  }
+
+  .clock-date {
+    font-size: 0.9rem;
+  }
+
+  .attendance-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .status-indicator {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+  }
+
+  .status-preview {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .btn-checkin,
+  .btn-checkout {
+    padding: 1.25rem 2rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .time-info {
+    padding: 1rem;
+  }
+
+  .time-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .modal-time {
+    font-size: 2rem;
+  }
+
+  .info-card {
+    padding: 1.5rem;
+  }
 }
 

@@ -64,9 +64,34 @@
 .summary-card {
   background: white;
   padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card:hover::before {
+  transform: scaleX(1);
 }
 
 .summary-card h3 {
@@ -77,9 +102,25 @@
 }
 
 .summary-card p {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin: 0;
+  margin: 0.5rem 0 0 0;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: countUp 0.8s ease-out;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .summary-card.present p {
@@ -101,8 +142,21 @@
 .calendar-view {
   background: white;
   padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .calendar-grid {
@@ -118,11 +172,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  border: 2px solid transparent;
+  font-weight: 500;
 }
 
 .calendar-day::before {
@@ -141,9 +197,10 @@
 }
 
 .calendar-day:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.08) translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   z-index: 10;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .calendar-day.today {
@@ -237,9 +294,11 @@
 .table-view {
   background: white;
   padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow-x: auto;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.5s ease-out;
 }
 
 table {
@@ -248,14 +307,28 @@ table {
 }
 
 thead {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 th,
 td {
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   text-align: left;
   border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.2s ease;
+}
+
+tbody tr {
+  transition: all 0.2s ease;
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 th {
@@ -341,17 +414,27 @@ th {
 
 .export-btn {
   padding: 0.75rem 1.5rem;
-  background: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: background 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .export-btn:hover {
-  background: #5568d3;
+  background: linear-gradient(135deg, #5568d3 0%, #6a3d8f 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.export-btn:active {
+  transform: translateY(0);
 }
 
 .table-wrapper {
@@ -414,19 +497,40 @@ th.sortable:hover {
 
   .calendar-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+  }
+
+  .calendar-day {
+    font-size: 0.85rem;
   }
 
   .table-controls {
     flex-direction: column;
+    gap: 1rem;
   }
 
   .search-filter-group {
     width: 100%;
+    flex-direction: column;
   }
 
   .search-input,
-  .filter-select {
+  .filter-select,
+  .export-btn {
     width: 100%;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .summary-card {
+    padding: 1rem;
+  }
+
+  .summary-card p {
+    font-size: 2rem;
   }
 }
 

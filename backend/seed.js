@@ -21,8 +21,25 @@ mongoose.connect(mongoURI, {
 
 async function seedDatabase() {
   try {
+    // First, clean up any Sunday attendance records (in case we're not clearing all data)
+    console.log('🧹 Cleaning up any Sunday attendance records...');
+    // Find all attendance records and filter for Sundays
+    const allAttendance = await Attendance.find({});
+    const sundayRecords = allAttendance.filter(record => {
+      const recordDate = new Date(record.date);
+      return recordDate.getDay() === 0; // Sunday = 0
+    });
+    
+    if (sundayRecords.length > 0) {
+      const sundayIds = sundayRecords.map(record => record._id);
+      await Attendance.deleteMany({ _id: { $in: sundayIds } });
+      console.log(`✅ Removed ${sundayRecords.length} Sunday attendance records`);
+    } else {
+      console.log('✅ No Sunday records found');
+    }
+    
     // Clear existing data (optional - comment out if you want to keep existing data)
-    console.log('🗑️  Clearing existing data...');
+    console.log('\n🗑️  Clearing existing data...');
     await User.deleteMany({});
     await Attendance.deleteMany({});
     console.log('✅ Existing data cleared\n');
